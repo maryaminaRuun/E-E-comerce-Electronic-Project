@@ -1,42 +1,9 @@
-import React, { useContext, useState } from 'react';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import { useContext, useState } from 'react';
+import { Link } from 'react-router-dom';
 import CartContext from '../context/CartContext';
-
-const Checkout = () => {
-  const { cart, calculateTotal } = useContext(CartContext);
-  const [orderPlaced, setOrderPlaced] = useState(false);
-
-  const handlePlaceOrder = () => {
-    // Logic to handle order placement
-    setOrderPlaced(true);
-  };
-
-  return (
-    <div className="container m-4">
-      <h2 className="mb-4">Checkout</h2>
-      {orderPlaced ? (
-        <div className="alert alert-success" role="alert">
-          Your order has been placed successfully!
-        </div>
-      ) : (
-        <div>
-          <h4>Order Summary</h4>
-          <ul className="list-group mb-4">
-            {cart.map(item => (
-              <li key={item.id} className="list-group-item d-flex justify-content-between align-items-center">
-                {item.name} (x{item.quantity})
-                <span>${(item.price * item.quantity).toFixed(2)}</span>
-              </li>
-            ))}
-          </ul>
-          <h4>Total: ${calculateTotal().toFixed(2)}</h4>
-          <button className="btn btn-success mt-3" onClick={handlePlaceOrder}>
-            Place Order
-          </button>
-        </div>
-      )}
-    </div>
-  );
-};
-
+import { isSupabaseConfigured, supabase } from '../lib/supabase';
+const Checkout=()=>{const{cart,calculateTotal,clearCart}=useContext(CartContext);const[form,setForm]=useState({name:'',email:'',phone:'',address:''});const[status,setStatus]=useState('');const[busy,setBusy]=useState(false);
+ const submit=async e=>{e.preventDefault();if(!isSupabaseConfigured){setStatus('Store database is not configured yet.');return}setBusy(true);const{data,error}=await supabase.rpc('create_order',{customer_name:form.name,customer_email:form.email,customer_phone:form.phone,shipping_address:form.address,cart_items:cart.map(i=>({product_id:i.id,name:i.name,price:i.price,quantity:i.quantity}))});if(error)setStatus(error.message);else{clearCart();setStatus(`Order ${String(data).slice(0,8).toUpperCase()} placed successfully.`)}setBusy(false)};
+ if(!cart.length&&!status)return <div className="empty-state page-space"><h1>Your cart is empty</h1><Link className="button primary" to="/products">Start shopping</Link></div>;
+ return <div className="container-wide catalog"><div className="catalog-heading"><span className="eyebrow">SECURE CHECKOUT</span><h1>Complete your order</h1></div>{status&&<div className={status.includes('successfully')?'alert alert-success':'form-error'}>{status}</div>}{cart.length>0&&<div className="detail-grid"><form className="auth-card" onSubmit={submit}><h2>Delivery details</h2>{Object.keys(form).map(key=><label key={key}>{key[0].toUpperCase()+key.slice(1)}<input type={key==='email'?'email':'text'} value={form[key]} onChange={e=>setForm({...form,[key]:e.target.value})} required/></label>)}<button disabled={busy} className="button primary">{busy?'Placing order…':'Place order'}</button></form><div className="auth-card"><h2>Order summary</h2>{cart.map(i=><div className="product-bottom" key={i.id}><span>{i.name} × {i.quantity}</span><b>${(i.price*i.quantity).toFixed(2)}</b></div>)}<hr/><div className="product-bottom"><h3>Total</h3><h2>${calculateTotal().toFixed(2)}</h2></div></div></div>}</div>};
 export default Checkout;

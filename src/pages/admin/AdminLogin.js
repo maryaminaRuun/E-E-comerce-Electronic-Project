@@ -1,0 +1,8 @@
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { isSupabaseConfigured, supabase } from '../../lib/supabase';
+const AdminLogin=()=>{const navigate=useNavigate();const[email,setEmail]=useState('');const[password,setPassword]=useState('');const[error,setError]=useState('');const[loading,setLoading]=useState(false);
+ useEffect(()=>{if(supabase)supabase.auth.getSession().then(({data})=>data.session&&navigate('/admin'))},[navigate]);
+ const submit=async e=>{e.preventDefault();if(!isSupabaseConfigured){setError('Supabase environment variables are missing.');return}setLoading(true);const{data,error:e2}=await supabase.auth.signInWithPassword({email,password});if(e2){setError(e2.message);setLoading(false);return}const{data:profile}=await supabase.from('profiles').select('role').eq('id',data.user.id).single();if(profile?.role!=='admin'){await supabase.auth.signOut();setError('This account does not have admin access.');setLoading(false);return}navigate('/admin')};
+ return <div className="auth-page"><div className="auth-card admin-login"><span className="brand-mark"><i className="fa-solid fa-bolt"/></span><span className="eyebrow">SECURE ADMIN PORTAL</span><h1>Welcome back</h1><p>Manage products, orders and store activity.</p>{error&&<div className="form-error">{error}</div>}<form onSubmit={submit}><label>Email address<input type="email" value={email} onChange={e=>setEmail(e.target.value)} required/></label><label>Password<input type="password" value={password} onChange={e=>setPassword(e.target.value)} required/></label><button disabled={loading} className="button primary">{loading?'Signing in…':'Sign in to dashboard'}</button></form></div></div>};
+export default AdminLogin;
