@@ -1,177 +1,28 @@
-import React from 'react';
+import { useContext } from 'react';
 import { Link } from 'react-router-dom';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import mockProducts from '../pages/mockProducts';
+import CartContext from '../context/CartContext';
+import ProductCard from '../components/ProductCard';
+import ProductContext from '../context/ProductContext';
 
-const featuredProducts = mockProducts.slice(0, 9); // Adjust as needed
+const categories = [
+  ['fa-mobile-screen-button', 'Phones'], ['fa-laptop', 'Computers'], ['fa-headphones', 'Audio'],
+  ['fa-gamepad', 'Gaming'], ['fa-camera', 'Cameras'], ['fa-tv', 'TV & Home']
+];
 
 const Home = () => {
-  return (
-    <div className="container my-5">
-      <header className="jumbotron text-center">
-        <h1 className="display-4">Welcome to Our Electronics Store!</h1>
-        <p className="lead">Find the best electronics products here.</p>
-        <Link to="/products" className="btn btn-primary btn-lg">
-          Shop Now
-        </Link>
-      </header>
-
-      <h2 className="mb-4">Featured Products</h2>
-      <div className="row">
-        {featuredProducts.map(product => (
-          <div className="col-md-4" key={product.id}>
-            <div className="card mb-4">
-              <img src={product.image} className="card-img-top" width={100} height={200} alt={product.name} />
-              <div className="card-body">
-                <h5 className="card-title">{product.name}</h5>
-                <p className="card-text">{product.description}</p>
-                <p className="card-text"><strong>${product.price.toFixed(2)}</strong></p>
-                <Link to={`/product/${product.id}`} className="btn btn-secondary">
-                  View Details
-                </Link>
-              </div>
-            </div>
-          </div>
-        ))}
+  const { addToCart } = useContext(CartContext);
+  const { products } = useContext(ProductContext);
+  return <>
+    <section className="hero">
+      <div className="container-wide hero-grid">
+        <div className="hero-copy"><span className="eyebrow">NEXT-GEN TECHNOLOGY</span><h1>Upgrade your world.<br/><em>Power your future.</em></h1><p>Discover premium electronics selected for performance, design, and everyday life.</p><div className="hero-actions"><Link className="button primary" to="/products">Shop collection <i className="fa-solid fa-arrow-right" /></Link><a className="button ghost" href="#featured">Explore deals</a></div><div className="hero-proof"><b>4.9/5</b><span>★★★★★<small>Trusted by 12,000+ customers</small></span></div></div>
+        <div className="hero-visual"><div className="hero-orb"/><img src={products[1]?.image || products[0]?.image} alt="Premium laptop"/><div className="floating-card"><span>Top rated</span><b>Laptop Pro</b><small>Power meets portability</small></div></div>
       </div>
-    </div>
-  );
+    </section>
+    <section className="benefits container-wide"><div><i className="fa-solid fa-truck-fast"/><span><b>Fast delivery</b><small>Reliable nationwide shipping</small></span></div><div><i className="fa-solid fa-shield-halved"/><span><b>2-year warranty</b><small>Shop with confidence</small></span></div><div><i className="fa-solid fa-headset"/><span><b>Expert support</b><small>Here when you need us</small></span></div><div><i className="fa-solid fa-lock"/><span><b>Secure payment</b><small>Your data stays protected</small></span></div></section>
+    <section className="section container-wide"><div className="section-heading"><div><span className="eyebrow">SHOP BY CATEGORY</span><h2>Find your next upgrade</h2></div><Link to="/products">View all products <i className="fa-solid fa-arrow-right"/></Link></div><div className="category-grid">{categories.map(([icon, label]) => <Link key={label} to={`/products?category=${encodeURIComponent(label)}`}><i className={`fa-solid ${icon}`}/><span>{label}</span><small>Explore collection</small></Link>)}</div></section>
+    <section className="section soft-section" id="featured"><div className="container-wide"><div className="section-heading"><div><span className="eyebrow">CUSTOMER FAVORITES</span><h2>Featured technology</h2></div><Link to="/products">Shop all <i className="fa-solid fa-arrow-right"/></Link></div><div className="products-grid">{products.slice(0,8).map(product => <ProductCard key={product.id} product={product} addToCart={addToCart}/>)}</div></div></section>
+    <section className="newsletter"><div><span className="eyebrow">STAY AHEAD</span><h2>Tech news, offers and launches.</h2><p>Join our community and get 10% off your first order.</p></div><form onSubmit={e=>e.preventDefault()}><input type="email" required placeholder="Enter your email address"/><button>Get 10% off</button></form></section>
+  </>;
 };
-
 export default Home;
-
-
-
-// import React from 'react';
-// import { Link } from 'react-router-dom';
-// // import Header from '/'
-// import 'bootstrap/dist/css/bootstrap.min.css';
-// // Import images
-
-
-// // Mock data for featured products
-// const featuredProducts = [
-//   {
-//     id: 1,
-//     name: 'Smartphone X',
-//     price: 999.99,
-//     description: 'Latest model with advanced features.',
-//     image: require('../assets/Smartphone X.jpeg'),
-//   },
-//   {
-//     id: 2,
-//     name: 'Laptop Pro',
-//     price: 1299.99,
-//     description: 'High performance laptop.',
-//     image: require('../assets/Laptop Pro.jpeg'),
-//   },
-//   {
-//     id: 3,
-//     name: 'Wireless Earbuds',
-//     price: 199.99,
-//     description: 'Noise-cancelling earbuds with long battery life.',
-//     image: require('../assets/Wireless Earbuds.jpeg'),
-//   },
-//   {
-//     id: 4,
-//     name: 'Samsung Galaxy S24 Ultra',
-//     price: 199.99,
-//     description: 'Noise-cancelling earbuds with long battery life.',
-//     image: require('../assets/SamsungGalaxyS24.jpg'),
-//   },
-//   {
-//     id: 5,
-//     name: 'Smart Watch',
-//     price: 299.99,
-//     description: 'Stay connected with this stylish smart watch.',
-//     image: require('../assets/Smart Watch.jpeg'),
-//   },
-//   {
-//     id: 6,
-//     name: 'Bluetooth Speaker',
-//     price: 99.99,
-//     description: 'Portable speaker with excellent sound quality.',
-//     image: require('../assets/Bluetooth Speaker.jpeg'),
-//   },
-//   {
-//     id: 7,
-//     name: 'Gaming Console',
-//     price: 499.99,
-//     description: 'Next-gen console for immersive gaming experiences.',
-//     image: require('../assets/Gaming Console.jpeg'),
-//   },
-//   {
-//     id: 8,
-//     name: 'Digital Camera',
-//     price: 599.99,
-//     description: 'Capture your moments with high precision.',
-//     image: require('../assets/Digital Camera.jpeg'),
-//   },
-//   {
-//     id: 9,
-//     name: 'Drone',
-//     price: 899.99,
-//     description: 'High-performance drone for aerial photography.',
-//     image: require('../assets/Drone.jpeg'),
-//   },
-//   {
-//     id: 10,
-//     name: 'VR Headset',
-//     price: 399.99,
-//     description: 'Experience virtual reality with this VR headset.',
-//     image: require('../assets/VR Headset.jpeg'),
-//   },
-//   {
-//     id: 11,
-//     name: '4K OLED TV',
-//     price: 1499.99,
-//     description: 'Ultra HD TV with stunning picture quality.',
-//     image: require('../assets/OLED TV.jpeg'),
-//   },
-//   {
-//     id: 12,
-//     name: 'All Devices ',
-//     price: 1499.99,
-//     description: 'All Devices with stunning picture quality.',
-//     image: require('../assets/product1.jpeg'),
-//   },
-// ]
-
-// const Home = () => {
-//   return (
-//     <div className="container mt-4">
-//       <header className="jumbotron text-center">
-//         <h1 className="display-4">Welcome to Our Electronics Store!</h1>
-//         <p className="lead">Find the best electronics products here.</p>
-//         <Link to="/products" className="btn btn-primary btn-lg">
-//           Shop Now
-//         </Link>
-//       </header>
-
-//       <h2 className="mb-4">Featured Products</h2>
-//       <div className="row">
-//         {featuredProducts.map(product => (
-//           <div className="col-md-4" key={product.id}>
-//             <div className="card mb-4">
-//               <img src={product.image} className="card-img-top" width={100} height={200} alt={product.name} />
-//               <div className="card-body">
-//                 <h5 className="card-title">{product.name}</h5>
-//                 <p className="card-text">{product.description}</p>
-//                 <p className="card-text"><strong>${product.price.toFixed(2)}</strong></p>
-//                 <Link to={`/products`} className="btn btn-primary">
-//                   View Products
-//                 </Link>
-//               </div>
-//             </div>
-//           </div>
-//         ))}
-//       </div>
-//     </div>
-//   );
-// };
-// export default Home;
-
-
-
-
-
